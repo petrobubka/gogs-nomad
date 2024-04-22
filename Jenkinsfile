@@ -4,10 +4,7 @@ pipeline {
     stages {
         stage('Build and Test') {
             agent { 
-                nomad {
-                    // Specify the task group or template defined in the Nomad cloud configuration
                     label 'nomad-alpine'
-                }
             }
             steps {
                 sh '''
