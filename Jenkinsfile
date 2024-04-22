@@ -11,7 +11,7 @@ pipeline {
                 echo "Running on Nomad agent"
                 apk update
                 apk add --no-cache linux-pam gcompat binutils go postgresql-client git openssh
-                go build -o gogs -buildvcs=false
+                go build -o gogs
                 go test -v -cover ./...
                 '''
             }
