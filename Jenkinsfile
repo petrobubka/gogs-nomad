@@ -1,19 +1,30 @@
 pipeline {
-    agent none // This specifies that no global agent will be used
+    agent none
 
     stages {
-        stage('Build and Test') {
-            agent { 
-                    label 'nomad-alpine'
-            }
+        stage('Submit Alpine Job to Nomad') {
             steps {
-                sh '''
-                echo "Running on Nomad agent"
-                apk update
-                apk add --no-cache linux-pam gcompat binutils go postgresql-client git openssh
-                go build -o gogs -buildvcs=false
-                go test -v -cover ./...
-                '''
+                script {
+                    sh 'nomad job run alpine_job.hcl'
+                }
+            }
+        }
+
+        stage('Submit Kaniko Job to Nomad') {
+            steps {
+                script {
+                    sh 'nomad job run kaniko_job.hcl'
+                }
+            }
+        }
+
+        stage('Check Job Status') {
+            steps {
+                script {
+                    // Polling or a webhook might be used here to determine when the job has completed
+                    sh 'nomad job status gogs-build'
+                    sh 'nomad job status kaniko-build'
+                }
             }
         }
     }
