@@ -13,23 +13,9 @@ pipeline {
                 sh '''
                 echo "Running on Nomad agent"
                 apk update
-                apk add --no-cache go git
-                go build -o myapp
-                go test -v ./...
-                '''
-            }
-        }
-
-        stage('Deploy') {
-            agent { 
-                nomad {
-                    label 'nomad-kaniko'
-                }
-            }
-            steps {
-                sh '''
-                /kaniko/executor --dockerfile Dockerfile --context `pwd` \
-                                 --destination myrepo/myapp:latest
+                apk add --no-cache linux-pam gcompat binutils go postgresql-client git openssh
+                go build -o gogs -buildvcs=false
+                go test -v -cover ./...
                 '''
             }
         }
