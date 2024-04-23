@@ -20,7 +20,9 @@ pipeline {
         // Modified stage to execute SSH command on the Built-In Node
         stage('Execute SSH Command') {
             agent { 
-                label 'master' // Running this stage on the Jenkins master node
+              node {
+               label 'master'
+        }               
             }
             steps {
                 script {
