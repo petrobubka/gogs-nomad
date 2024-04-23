@@ -1,16 +1,26 @@
-pipeline {
-    agent none // This specifies that no global agent will be used
+def executeSSHCommand(String command) {
+    sshPublisher(
+        publishers: [
+            sshPublisherDesc(
+                configName: "nomad", 
+                verbose: true,
+                transfers: [
+                    sshTransfer(
+                        execCommand: command
+                    )
+                ]
+            )
+        ]
+    )
+}
 
+pipeline {
+    agent any
     stages {
-        stage('Build Docker Image') {
-            agent {
-                label 'nomad-docker'
-            }
+        stage('Clean previous') {
             steps {
-                sh '''
-                docker build -t petrobubka/my_gogs_image_nomad:latest -f Dockerfile_app .
-                '''
+                executeSSHCommand("nomad job run /home/vagrant/gogs_job.hcl")
             }
         }
-    }
+        }
 }
